@@ -153,3 +153,4 @@ def get_pretrained_vit(num_classes=10, image_size=224, pretrained_path=None, use
     
     return model
 
+

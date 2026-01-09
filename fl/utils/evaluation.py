@@ -225,3 +225,4 @@ def evaluate_local_personalization(args, global_model, test_dataset, user_groups
     
     return avg_acc, avg_loss, client_results
 
+

@@ -109,3 +109,4 @@ class modelC(nn.Module):
         pool_out.squeeze_(-1)
         return pool_out
 
+

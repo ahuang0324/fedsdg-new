@@ -248,3 +248,4 @@ class LocalUpdate(object):
         accuracy = correct/total
         return accuracy, loss
 
+

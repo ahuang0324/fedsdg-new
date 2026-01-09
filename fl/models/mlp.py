@@ -24,3 +24,4 @@ class MLP(nn.Module):
         x = self.layer_hidden(x)
         return x
 
+
