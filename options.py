@@ -314,7 +314,7 @@ def args_parser():
                         default=use_offline_default,
                         help='Use offline preprocessed data')
     parser.add_argument('--offline_data_root', type=str, 
-                        default='./data/preprocessed/',
+                        default='./datasets/preprocessed',
                         help='Offline data directory')
     
     # ==========================================================================

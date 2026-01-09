@@ -53,12 +53,12 @@ class OfflineCIFAR10(Dataset):
         if not os.path.exists(self.images_path):
             raise FileNotFoundError(
                 f"Preprocessed image file not found: {self.images_path}\n"
-                f"Please run: python scripts/preprocess/preprocess_cifar10.py --image_size {image_size}"
+                f"Please run: bash scripts/preprocess/run_preprocess.sh --dataset cifar10 --image_size {image_size}"
             )
         if not os.path.exists(self.labels_path):
             raise FileNotFoundError(
                 f"Preprocessed label file not found: {self.labels_path}\n"
-                f"Please run: python scripts/preprocess/preprocess_cifar10.py --image_size {image_size}"
+                f"Please run: bash scripts/preprocess/run_preprocess.sh --dataset cifar10 --image_size {image_size}"
             )
         
         # Load data with memory mapping
@@ -151,12 +151,12 @@ class OfflineCIFAR100(Dataset):
         if not os.path.exists(self.images_path):
             raise FileNotFoundError(
                 f"Preprocessed image file not found: {self.images_path}\n"
-                f"Please run: python scripts/preprocess/preprocess_cifar100.py"
+                f"Please run: bash scripts/preprocess/run_preprocess.sh --dataset cifar100 --image_size {image_size}"
             )
         if not os.path.exists(self.labels_path):
             raise FileNotFoundError(
                 f"Preprocessed label file not found: {self.labels_path}\n"
-                f"Please run: python scripts/preprocess/preprocess_cifar100.py"
+                f"Please run: bash scripts/preprocess/run_preprocess.sh --dataset cifar100 --image_size {image_size}"
             )
         
         print(f"[OfflineCIFAR100] Loading preprocessed data (memory-mapped mode)...")

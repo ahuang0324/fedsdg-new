@@ -1,8 +1,8 @@
 #!/bin/bash
-# FedLoRA with Pretrained ViT - CIFAR-100 with offline preprocessed data
-# Parameter-efficient federated learning with LoRA
+# FedLoRA with Pretrained ViT - CIFAR-100 (离线预处理数据)
+# LoRA 参数高效微调的联邦学习
 
-# ==================== Configuration ====================
+# ==================== 参数配置 ====================
 ALG="fedlora"
 MODEL="vit"
 MODEL_VARIANT="pretrained"
@@ -19,32 +19,30 @@ OPTIMIZER="adam"
 LORA_R=8
 LORA_ALPHA=16
 DIRICHLET_ALPHA=0.1
-GPU=0
+GPU=2
+OFFLINE_DATA_ROOT="./datasets/preprocessed"
 # =======================================================
-
-LOG_SUBDIR="${ALG}_${MODEL_VARIANT}_${MODEL}_${DATASET}_E${EPOCHS}_lr${LR}_alpha${DIRICHLET_ALPHA}_bs${LOCAL_BS}"
-OFFLINE_DATA_ROOT="./data/preprocessed/"
 
 export HF_ENDPOINT=https://hf-mirror.com
 
 echo "=========================================="
-echo "FedLoRA Training - CIFAR-100 (Pretrained + Offline Data)"
+echo "FedLoRA 训练 - CIFAR-100 (预训练 + 离线数据)"
 echo "=========================================="
 echo ""
-echo "Configuration:"
-echo "  - Algorithm: ${ALG} (LoRA parameter-efficient fine-tuning)"
-echo "  - Model: ViT-Tiny (timm pretrained, ImageNet-21k)"
-echo "  - Dataset: ${DATASET} (offline preprocessed ${IMAGE_SIZE}x${IMAGE_SIZE})"
-echo "  - Epochs: ${EPOCHS}"
-echo "  - Clients: ${NUM_USERS}"
-echo "  - Participation rate: $(echo "scale=0; ${FRAC} * 100" | bc)%"
-echo "  - Local Epochs: ${LOCAL_EP}"
-echo "  - Local Batch Size: ${LOCAL_BS}"
-echo "  - LoRA rank: ${LORA_R}"
-echo "  - LoRA alpha: ${LORA_ALPHA}"
-echo "  - Learning rate: ${LR}"
-echo "  - Optimizer: ${OPTIMIZER}"
-echo "  - Dirichlet alpha: ${DIRICHLET_ALPHA}"
+echo "训练配置："
+echo "  - 算法: ${ALG} (LoRA 参数高效微调)"
+echo "  - 模型: ViT-Tiny (timm 预训练, ImageNet-21k)"
+echo "  - 数据集: ${DATASET} (离线预处理 ${IMAGE_SIZE}x${IMAGE_SIZE})"
+echo "  - 训练轮次: ${EPOCHS}"
+echo "  - 客户端数量: ${NUM_USERS}"
+echo "  - 参与率: $(echo "scale=0; ${FRAC} * 100" | bc)%"
+echo "  - 本地 Epoch: ${LOCAL_EP}"
+echo "  - 本地 Batch Size: ${LOCAL_BS}"
+echo "  - LoRA 秩: ${LORA_R}"
+echo "  - LoRA Alpha: ${LORA_ALPHA}"
+echo "  - 学习率: ${LR}"
+echo "  - 优化器: ${OPTIMIZER}"
+echo "  - Dirichlet Alpha: ${DIRICHLET_ALPHA}"
 echo "  - GPU: ${GPU}"
 echo ""
 echo "=========================================="
@@ -71,21 +69,15 @@ python main.py \
     --lora_r ${LORA_R} \
     --lora_alpha ${LORA_ALPHA} \
     --dirichlet_alpha ${DIRICHLET_ALPHA} \
-    --gpu ${GPU} \
-    --log_subdir ${LOG_SUBDIR}
+    --gpu ${GPU}
 
 echo ""
 echo "=========================================="
-echo "Training Complete!"
+echo "训练完成！"
 echo "=========================================="
 echo ""
-echo "Output locations:"
-echo "  - TensorBoard logs: ./logs/${LOG_SUBDIR}/"
-echo "  - Experiment summary: ./save/summaries/${DATASET}_${MODEL}_${ALG}_E${EPOCHS}_summary.txt"
-echo "  - Final model: ./save/models/${DATASET}_${MODEL}_final.pth"
+echo "LoRA 优势："
+echo "  - 参数高效: 仅训练 ~3.5% 的参数"
+echo "  - 通信高效: 减少 ~96.5% 的通信开销"
+echo "  - 内存高效: 客户端内存占用更小"
 echo ""
-echo "View TensorBoard:"
-echo "  tensorboard --logdir=./logs/${LOG_SUBDIR}"
-echo ""
-
-

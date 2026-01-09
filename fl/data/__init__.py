@@ -4,12 +4,14 @@
 
 from .datasets import get_dataset, DatasetSplit
 from .sampling import dirichlet_partition, dirichlet_partition_train_test
-from .offline_dataset import OfflineCIFAR10, OfflineCIFAR100
+from .offline_dataset import OfflineCIFAR10, OfflineCIFAR100, get_offline_cifar10, get_offline_cifar100
+from .preprocess import preprocess_dataset
 
 __all__ = [
     'get_dataset', 'DatasetSplit',
     'dirichlet_partition', 'dirichlet_partition_train_test',
-    'OfflineCIFAR10', 'OfflineCIFAR100',
+    'OfflineCIFAR10', 'OfflineCIFAR100', 'get_offline_cifar10', 'get_offline_cifar100',
+    'preprocess_dataset',
 ]
 
 
