@@ -60,10 +60,15 @@ env/
 # Project Directories - Keep structure, ignore contents
 # =============================================================================
 
-# Data directory
+# Data directory (if exists)
 data/*
 !data/.gitkeep
 !data/README.md
+
+# Datasets directory (keep structure, ignore contents)
+datasets/*
+!datasets/.gitkeep
+!datasets/README.md
 
 # Outputs directory (models, results, summaries, visualizations, checkpoints)
 outputs/*
@@ -78,6 +83,7 @@ outputs/visualizations/*
 # Logs directory (TensorBoard logs)
 logs/*
 !logs/.gitkeep
+!logs/README.md
 
 # Legacy save directory (deprecated, use outputs/)
 save/*
@@ -86,7 +92,6 @@ save/*
 # =============================================================================
 # Preprocessed Data (large files)
 # =============================================================================
-data/preprocessed/*
 *.npy
 *.memmap
 
