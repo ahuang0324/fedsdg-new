@@ -38,9 +38,11 @@ docs/
     │   ├── FedLoRA 代码优化报告.md               # FedLoRA 优化
     │   ├── 通信效率优化实施报告.md               # 通信效率优化
     │   └── 通信量统计功能实施报告.md             # 通信量统计实施
-    └── performance_analysis/     # 性能分析
-        ├── FedSDG_性能崩溃根因分析与修复报告.md  # FedSDG 性能分析
-        └── FedAvg与FedLoRA训练时间分析报告.md    # 训练时间对比
+    ├── performance_analysis/     # 性能分析
+    │   ├── FedSDG_性能崩溃根因分析与修复报告.md  # FedSDG 性能分析
+    │   └── FedAvg与FedLoRA训练时间分析报告.md    # 训练时间对比
+    └── infrastructure/           # 基础设施与运维
+        └── Git仓库大文件问题诊断与修复报告.md    # Git 仓库管理问题
 ```
 
 ## 📖 文档分类说明
@@ -65,6 +67,7 @@ docs/
 - **bug_reports**: Bug 修复报告和问题诊断
 - **optimization**: 代码优化和性能改进
 - **performance_analysis**: 性能分析和对比研究
+- **infrastructure**: 基础设施、运维和开发环境相关问题
 
 ## 🔍 快速导航
 
@@ -81,6 +84,7 @@ docs/
 ### 问题排查
 1. [FedSDG_BUG_REPORT_AND_FIX.md](technical_reports/bug_reports/FedSDG_BUG_REPORT_AND_FIX.md)
 2. [FedLoRA 训练准确率下降问题诊断报告.md](technical_reports/bug_reports/FedLoRA%20训练准确率下降问题诊断报告.md)
+3. [Git仓库大文件问题诊断与修复报告.md](technical_reports/infrastructure/Git仓库大文件问题诊断与修复报告.md) - 仓库管理问题
 
 ### 性能优化
 1. [通信效率优化实施报告.md](technical_reports/optimization/通信效率优化实施报告.md)
