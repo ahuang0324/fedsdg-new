@@ -1,0 +1,79 @@
+# =============================================================================
+# FedLoRA - Federated Low-Rank Adaptation Configuration
+# =============================================================================
+# Usage: python main.py --config configs/fedlora.yaml [--dataset cifar100]
+#
+# FedLoRA achieves communication efficiency by only transmitting LoRA parameters.
+# Compression ratio typically >99% compared to full model transmission.
+# =============================================================================
+
+algorithm: fedlora
+
+# =============================================================================
+# Dataset Presets
+# =============================================================================
+dataset: cifar100  # Options: cifar, cifar100 (LoRA requires ViT, hence image datasets)
+
+datasets:
+  cifar:
+    num_classes: 10
+    model: vit
+    model_variant: pretrained
+    image_size: 224
+    use_offline: true
+    
+  cifar100:
+    num_classes: 100
+    model: vit
+    model_variant: pretrained
+    image_size: 224
+    use_offline: true
+
+# =============================================================================
+# LoRA Settings (Core Parameters)
+# =============================================================================
+lora:
+  r: 8                      # LoRA rank (4-16 typical, lower = more compression)
+  alpha: 16                 # Scaling factor (typically 2*r)
+  train_mlp_head: true      # Whether to train classification head
+
+# =============================================================================
+# Federated Learning Settings
+# =============================================================================
+federated:
+  num_users: 100
+  frac: 0.1
+  dirichlet_alpha: 0.1
+
+# =============================================================================
+# Training Settings
+# =============================================================================
+training:
+  epochs: 70
+  local_ep: 3
+  local_bs: 128
+  lr: 0.001
+  optimizer: sgd
+  momentum: 0.5
+
+# =============================================================================
+# Evaluation Settings
+# =============================================================================
+evaluation:
+  test_frac: 0.3
+
+# =============================================================================
+# System Settings
+# =============================================================================
+system:
+  gpu: 0
+  seed: 42
+  verbose: 1
+
+# =============================================================================
+# Checkpoint Settings
+# =============================================================================
+checkpoint:
+  enable: false
+  save_frequency: 10
+

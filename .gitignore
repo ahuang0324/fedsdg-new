@@ -1,4 +1,6 @@
+# =============================================================================
 # Python
+# =============================================================================
 __pycache__/
 *.py[cod]
 *$py.class
@@ -23,13 +25,17 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+# =============================================================================
 # Virtual Environment
+# =============================================================================
 venv/
 ENV/
 env/
 .venv
 
+# =============================================================================
 # IDE
+# =============================================================================
 .vscode/
 .idea/
 *.swp
@@ -37,29 +43,56 @@ env/
 *~
 .DS_Store
 
+# =============================================================================
 # Jupyter Notebook
+# =============================================================================
 .ipynb_checkpoints
 *.ipynb
 
-# PyTorch
+# =============================================================================
+# PyTorch Model Files
+# =============================================================================
 *.pth
 *.pt
 *.ckpt
 
-# Project specific directories - keep structure but ignore contents
-# Data directory - keep folder structure but ignore data files
+# =============================================================================
+# Project Directories - Keep structure, ignore contents
+# =============================================================================
+
+# Data directory
 data/*
 !data/.gitkeep
+!data/README.md
 
-# Save directory - keep folder structure but ignore saved models
-save/*
-!save/.gitkeep
+# Outputs directory (models, results, summaries, visualizations, checkpoints)
+outputs/*
+!outputs/.gitkeep
+!outputs/README.md
+outputs/checkpoints/*
+outputs/models/*
+outputs/results/*
+outputs/summaries/*
+outputs/visualizations/*
 
-# Logs directory - keep folder structure but ignore log files
+# Logs directory (TensorBoard logs)
 logs/*
 !logs/.gitkeep
 
-# Temporary files
+# Legacy save directory (deprecated, use outputs/)
+save/*
+!save/.gitkeep
+
+# =============================================================================
+# Preprocessed Data (large files)
+# =============================================================================
+data/preprocessed/*
+*.npy
+*.memmap
+
+# =============================================================================
+# Temporary & Cache Files
+# =============================================================================
 *.tmp
 *.log
 *.cache
@@ -67,8 +100,20 @@ logs/*
 .coverage
 htmlcov/
 
-# System files
+# =============================================================================
+# System Files
+# =============================================================================
 .DS_Store
 Thumbs.db
 desktop.ini
 
+# =============================================================================
+# Large Binary Files
+# =============================================================================
+*.pkl
+*.pickle
+*.h5
+*.hdf5
+*.tar
+*.tar.gz
+*.zip

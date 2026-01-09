@@ -1,0 +1,83 @@
+# =============================================================================
+# FedAvg - Federated Averaging Configuration
+# =============================================================================
+# Usage: python main.py --config configs/fedavg.yaml [--dataset cifar100]
+#
+# Command line arguments will override config file settings.
+# =============================================================================
+
+algorithm: fedavg
+
+# =============================================================================
+# Dataset Presets (选择一个作为默认，可通过命令行覆盖)
+# =============================================================================
+dataset: cifar100  # Options: mnist, fmnist, cifar, cifar100
+
+# Dataset-specific settings
+datasets:
+  mnist:
+    num_classes: 10
+    model: mlp
+    model_variant: scratch
+    image_size: 28
+    
+  fmnist:
+    num_classes: 10
+    model: cnn
+    model_variant: scratch
+    image_size: 28
+    
+  cifar:
+    num_classes: 10
+    model: vit
+    model_variant: pretrained
+    image_size: 224
+    use_offline: true
+    
+  cifar100:
+    num_classes: 100
+    model: vit
+    model_variant: pretrained
+    image_size: 224
+    use_offline: true
+
+# =============================================================================
+# Federated Learning Settings
+# =============================================================================
+federated:
+  num_users: 100            # Total number of clients
+  frac: 0.1                 # Fraction of clients per round
+  dirichlet_alpha: 0.1      # Non-IID level (lower = more heterogeneous)
+
+# =============================================================================
+# Training Settings
+# =============================================================================
+training:
+  epochs: 70                # Global communication rounds
+  local_ep: 3               # Local epochs per client per round
+  local_bs: 128             # Local batch size
+  lr: 0.001                 # Learning rate
+  optimizer: sgd            # Optimizer type
+  momentum: 0.5             # SGD momentum
+
+# =============================================================================
+# Evaluation Settings
+# =============================================================================
+evaluation:
+  test_frac: 0.3            # Fraction of clients for local evaluation
+
+# =============================================================================
+# System Settings
+# =============================================================================
+system:
+  gpu: 0                    # GPU ID (-1 for CPU)
+  seed: 42                  # Random seed
+  verbose: 1                # Verbosity level
+  
+# =============================================================================
+# Checkpoint Settings
+# =============================================================================
+checkpoint:
+  enable: false
+  save_frequency: 10
+

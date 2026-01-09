@@ -1,0 +1,107 @@
+# =============================================================================
+# FedSDG - Federated Structure-Decoupled Gating Configuration
+# =============================================================================
+# Usage: python main.py --config configs/fedsdg.yaml [--dataset cifar100]
+#
+# FedSDG is the core method featuring:
+# - Dual-path LoRA: Global branch (aggregated) + Private branch (local)
+# - Learnable gating mechanism (λ_k) to balance global/private contributions
+# - Alignment-based server aggregation for improved convergence
+#
+# Loss Function: L = L_task + λ₁·Σ|m_k| + λ₂·||θ_private||²
+# =============================================================================
+
+algorithm: fedsdg
+
+# =============================================================================
+# Dataset Presets
+# =============================================================================
+dataset: cifar100  # Options: cifar, cifar100
+
+datasets:
+  cifar:
+    num_classes: 10
+    model: vit
+    model_variant: pretrained
+    image_size: 224
+    use_offline: true
+    
+  cifar100:
+    num_classes: 100
+    model: vit
+    model_variant: pretrained
+    image_size: 224
+    use_offline: true
+
+# =============================================================================
+# LoRA Settings (Dual-Path Structure)
+# =============================================================================
+lora:
+  r: 8                      # LoRA rank
+  alpha: 16                 # Scaling factor
+  train_mlp_head: true      # Train classification head
+
+# =============================================================================
+# FedSDG Specific Settings (核心参数)
+# =============================================================================
+fedsdg:
+  # Server aggregation method
+  server_agg_method: alignment  # 'alignment' (recommended) or 'fedavg'
+  
+  # Regularization coefficients
+  # Loss = L_task + λ₁·gate_penalty + λ₂·private_penalty
+  lambda1: 0.01             # Gate sparsity penalty (L1 on m_k)
+  lambda2: 0.001            # Private parameter regularization (L2 on θ_private)
+  
+  # Gate penalty type
+  # - 'unilateral': Push m_k towards 0 (encourage global dominance)
+  # - 'bilateral': Push m_k towards 0 or 1 (encourage binary choice)
+  gate_penalty_type: unilateral
+  
+  # Learning rate for gate parameters
+  lr_gate: 0.01             # Separate LR for lambda_k_logit parameters
+  
+  # Gradient clipping (stability)
+  grad_clip: 1.0            # Max gradient norm (0 to disable)
+
+# =============================================================================
+# Federated Learning Settings
+# =============================================================================
+federated:
+  num_users: 100
+  frac: 0.1
+  dirichlet_alpha: 0.1      # Highly heterogeneous (Non-IID)
+
+# =============================================================================
+# Training Settings
+# =============================================================================
+training:
+  epochs: 100               # More epochs for gate learning
+  local_ep: 3
+  local_bs: 128
+  lr: 0.001                 # LR for global LoRA params
+  optimizer: sgd
+  momentum: 0.5
+
+# =============================================================================
+# Evaluation Settings
+# =============================================================================
+evaluation:
+  test_frac: 0.3
+
+# =============================================================================
+# System Settings
+# =============================================================================
+system:
+  gpu: 0
+  seed: 42
+  verbose: 1
+
+# =============================================================================
+# Checkpoint Settings (Recommended for FedSDG)
+# =============================================================================
+checkpoint:
+  enable: true              # Enable for FedSDG to track gate evolution
+  save_frequency: 10        # Save every N rounds
+  save_client_weights: true
+
