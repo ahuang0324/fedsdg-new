@@ -48,22 +48,16 @@ env/
 
 # Project specific directories - keep structure but ignore contents
 # Data directory - keep folder structure but ignore data files
-data/
+data/*
 !data/.gitkeep
-!data/*/
-data/**/*
 
 # Save directory - keep folder structure but ignore saved models
-save/
+save/*
 !save/.gitkeep
-!save/*/
-save/**/*
 
 # Logs directory - keep folder structure but ignore log files
-logs/
+logs/*
 !logs/.gitkeep
-!logs/*/
-logs/**/*
 
 # Temporary files
 *.tmp
