@@ -577,7 +577,7 @@ def visualize_client_comparison(
 
 
 def visualize_all_gates(
-    model: Any, 
+    model: Any = None, 
     local_private_states: Optional[Dict[int, Dict[str, torch.Tensor]]] = None, 
     algorithm: str = 'fedsdg',
     experiment_name: str = 'experiment',
@@ -620,6 +620,9 @@ def visualize_all_gates(
         use_client_data = True
     else:
         # 回退到全局模型（但会警告用户这些值没有意义）
+        if model is None:
+            print("  ⚠ 未提供客户端私有状态或模型，跳过可视化")
+            return None, None
         gate_values = extract_gate_values(model)
         if not gate_values:
             print("  ⚠ 未找到门控参数，跳过可视化")
@@ -683,3 +686,170 @@ def visualize_all_gates(
     print("="*70 + "\n")
     
     return gate_values, all_client_gates if all_client_gates else None
+
+
+# =============================================================================
+# 命令行入口 - 用于手动可视化已保存的实验
+# =============================================================================
+
+def find_fedsdg_experiments() -> List[Tuple[str, str, float]]:
+    """
+    查找所有 FedSDG 实验的 checkpoint 目录
+    
+    Returns:
+        list: [(实验名称, checkpoint路径, 修改时间), ...]
+    """
+    from .paths import CHECKPOINTS_DIR
+    from datetime import datetime
+    
+    fedsdg_dir = os.path.join(CHECKPOINTS_DIR, 'fedsdg')
+    experiments = []
+    
+    if not os.path.exists(fedsdg_dir):
+        return experiments
+    
+    for exp_name in os.listdir(fedsdg_dir):
+        exp_path = os.path.join(fedsdg_dir, exp_name)
+        if os.path.isdir(exp_path):
+            private_states_path = os.path.join(exp_path, 'final_private_states.pkl')
+            if os.path.exists(private_states_path):
+                mtime = os.path.getmtime(exp_path)
+                experiments.append((exp_name, exp_path, mtime))
+    
+    experiments.sort(key=lambda x: x[2], reverse=True)
+    return experiments
+
+
+def load_private_states_from_checkpoint(checkpoint_dir: str) -> Optional[Dict[int, Dict[str, torch.Tensor]]]:
+    """
+    从 checkpoint 目录加载私有状态
+    
+    Args:
+        checkpoint_dir: checkpoint 目录路径
+        
+    Returns:
+        私有状态字典，或 None
+    """
+    import pickle
+    
+    private_states_path = os.path.join(checkpoint_dir, 'final_private_states.pkl')
+    
+    if not os.path.exists(private_states_path):
+        print(f"⚠ 未找到私有状态文件: {private_states_path}")
+        return None
+    
+    print(f"加载私有状态: {private_states_path}")
+    
+    with open(private_states_path, 'rb') as f:
+        return pickle.load(f)
+
+
+def main():
+    """命令行入口 - 手动可视化 FedSDG 门控系数"""
+    import argparse
+    from .paths import CHECKPOINTS_DIR
+    from datetime import datetime
+    
+    parser = argparse.ArgumentParser(
+        description='FedSDG 门控系数可视化工具',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+示例:
+  python -m fl.utils.visualization --list
+  python -m fl.utils.visualization --latest
+  python -m fl.utils.visualization --experiment cifar100_vit_pretrained
+  python -m fl.utils.visualization --checkpoint outputs/checkpoints/fedsdg/your_exp
+        """
+    )
+    
+    parser.add_argument('--checkpoint', '-c', type=str, default=None,
+                        help='Checkpoint 目录路径')
+    parser.add_argument('--experiment', '-e', type=str, default=None,
+                        help='实验名称（支持模糊匹配）')
+    parser.add_argument('--prefix', '-p', type=str, default='analysis',
+                        help='输出文件前缀（默认: analysis）')
+    parser.add_argument('--list', '-l', action='store_true',
+                        help='列出所有可用的 FedSDG 实验')
+    parser.add_argument('--latest', action='store_true',
+                        help='使用最新的实验')
+    
+    args = parser.parse_args()
+    
+    # 列出实验
+    if args.list:
+        experiments = find_fedsdg_experiments()
+        if not experiments:
+            print(f"\n⚠ 未找到任何 FedSDG 实验检查点")
+            print(f"  检查点目录: {os.path.join(CHECKPOINTS_DIR, 'fedsdg')}")
+            return 0
+        
+        print("\n" + "="*80)
+        print("可用的 FedSDG 实验")
+        print("="*80)
+        for i, (exp_name, exp_path, mtime) in enumerate(experiments, 1):
+            time_str = datetime.fromtimestamp(mtime).strftime('%Y-%m-%d %H:%M:%S')
+            print(f"\n  [{i}] {exp_name}")
+            print(f"      路径: {exp_path}")
+            print(f"      时间: {time_str}")
+        print("\n" + "="*80)
+        print(f"共 {len(experiments)} 个实验")
+        print("="*80 + "\n")
+        return 0
+    
+    # 解析 checkpoint 目录
+    checkpoint_dir = None
+    
+    if args.checkpoint:
+        if not os.path.exists(args.checkpoint):
+            print(f"✗ 指定目录不存在: {args.checkpoint}")
+            return 1
+        checkpoint_dir = args.checkpoint
+    elif args.experiment:
+        fedsdg_dir = os.path.join(CHECKPOINTS_DIR, 'fedsdg')
+        candidate = os.path.join(fedsdg_dir, args.experiment)
+        if os.path.exists(candidate):
+            checkpoint_dir = candidate
+        elif os.path.exists(fedsdg_dir):
+            for exp_name in os.listdir(fedsdg_dir):
+                if args.experiment in exp_name:
+                    checkpoint_dir = os.path.join(fedsdg_dir, exp_name)
+                    print(f"模糊匹配到实验: {exp_name}")
+                    break
+        if checkpoint_dir is None:
+            print(f"✗ 未找到匹配的实验: {args.experiment}")
+            return 1
+    elif args.latest:
+        experiments = find_fedsdg_experiments()
+        if experiments:
+            _, checkpoint_dir, _ = experiments[0]
+            print(f"使用最新实验: {os.path.basename(checkpoint_dir)}")
+        else:
+            print("✗ 未找到任何 FedSDG 实验")
+            return 1
+    else:
+        parser.print_help()
+        print("\n⚠ 请指定 --checkpoint, --experiment, --latest 或 --list")
+        return 0
+    
+    # 加载私有状态并可视化
+    private_states = load_private_states_from_checkpoint(checkpoint_dir)
+    if private_states is None:
+        return 1
+    
+    experiment_name = os.path.basename(checkpoint_dir)
+    
+    # 调用可视化函数
+    gate_values, _ = visualize_all_gates(
+        model=None,
+        local_private_states=private_states,
+        algorithm='fedsdg',
+        experiment_name=experiment_name,
+        prefix=args.prefix
+    )
+    
+    return 0 if gate_values else 1
+
+
+if __name__ == '__main__':
+    import sys
+    sys.exit(main())

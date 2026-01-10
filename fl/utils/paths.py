@@ -22,6 +22,7 @@
 """
 
 import os
+import time
 
 # =============================================================================
 # 项目根目录
@@ -144,14 +145,16 @@ def generate_experiment_name(args) -> str:
     """
     根据参数生成规范化的实验名称
     
-    格式: {dataset}_{model}_{variant}_E{epochs}_C{frac}_alpha{dirichlet_alpha}
+    格式: {dataset}_{model}_{variant}_E{epochs}_N{num_users}_C{frac}_alpha{dirichlet_alpha}_le{local_ep}_bs{local_bs}_lr{lr}_{timestamp}
     LoRA: 额外添加 _r{lora_r}_la{lora_alpha}
     FedSDG: 额外添加 _l1{lambda1}_l2{lambda2}
     
+    时间戳格式: YYYYMMDD_HHMMSS (确保每次运行唯一)
+    
     示例:
-        - cifar100_vit_pretrained_E50_C0.1_alpha0.5
-        - cifar100_vit_pretrained_E50_C0.1_alpha0.5_r8_la16
-        - cifar100_vit_pretrained_E50_C0.1_alpha0.5_r8_la16_l10.01_l20.001
+        - cifar100_vit_pretrained_E50_N100_C0.1_alpha0.5_le5_bs10_lr0.001_20260110_143025
+        - cifar100_vit_pretrained_E50_N100_C0.1_alpha0.5_r8_la16_le5_bs10_lr0.001_20260110_143025
+        - cifar100_vit_pretrained_E50_N100_C0.1_alpha0.5_r8_la16_l1_0.01_l2_0.0001_le5_bs10_lr0.001_20260110_143025
     """
     # 基础部分
     model_variant = getattr(args, 'model_variant', 'scratch')
@@ -160,6 +163,7 @@ def generate_experiment_name(args) -> str:
         args.model,
         model_variant,
         f'E{args.epochs}',
+        f'N{args.num_users}',
         f'C{args.frac}',
         f'alpha{args.dirichlet_alpha}',
     ]
@@ -177,5 +181,16 @@ def generate_experiment_name(args) -> str:
             f'l1_{args.lambda1}',
             f'l2_{args.lambda2}',
         ])
+    
+    # 训练参数
+    parts.extend([
+        f'le{args.local_ep}',
+        f'bs{args.local_bs}',
+        f'lr{args.lr}',
+    ])
+    
+    # 添加时间戳（确保每次运行唯一）
+    timestamp = time.strftime('%Y%m%d_%H%M%S')
+    parts.append(timestamp)
     
     return '_'.join(parts)
